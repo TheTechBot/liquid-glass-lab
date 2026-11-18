@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Refraction Test Lab</title>
+<link rel="icon" href="data:,">
+<link id="photo-src" rel="preload" as="image" href="assets/photo-nasa-blue-marble.jpg">
+<!-- build:css -->
+<link rel="stylesheet" href="../src/tokens.css">
+<link rel="stylesheet" href="../src/liquid-glass.css">
+<!-- /build:css -->
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; background: #0e1015; color: #e9eaf0; display: grid; grid-template-columns: 320px minmax(0, 1fr); min-height: 100vh; }
+  aside { padding: 18px; border-right: 1px solid #262a35; position: sticky; top: 0; height: 100vh; overflow: auto; }
+  aside h1 { font-size: 18px; margin: 0 0 4px; }
+  aside p { color: #a5a9b8; margin: 0 0 12px; font-size: 13px; }
+  .sel { display: grid; gap: 4px; margin-bottom: 10px; }
+  select, button { font: inherit; padding: 6px 8px; border-radius: 8px; border: 1px solid #343a4a; background: #181b24; color: inherit; }
+  .ctl { display: grid; grid-template-columns: 1fr 44px; gap: 2px 8px; margin: 8px 0; }
+  .ctl span:first-child { grid-column: 1 / -1; color: #c8cbd8; }
+  .ctl input[type=range] { width: 100%; }
+  .ctl output { text-align: right; font-variant-numeric: tabular-nums; color: #a5a9b8; }
+  .tintrow { display: flex; gap: 8px; align-items: center; } .tintrow input[type=range] { flex: 1; }
+  .side-h { font-size: 15px; margin: 18px 0 4px; }
+  #settings-json { background: #161922; border-radius: 8px; padding: 8px; font-size: 12px; user-select: all; white-space: pre-wrap; }
+  #status { font-size: 12px; color: #9da3b4; margin-top: 12px; }
+  main { padding: 18px; overflow: auto; }
+  .grid-wrap h2 { font-size: 15px; margin: 4px 0 10px; color: #cfd3df; }
+  .stage { position: relative; margin-bottom: 28px; border-radius: 14px; overflow: hidden; }
+  .backdrop { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .cell-label { position: absolute; z-index: 3; font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 6px; background: rgba(0,0,0,.6); color: #fff; }
+  .lab-glass { position: absolute; display: grid; place-items: center; isolation: isolate; color: #0b0b0f; font: 700 28px/1 system-ui, sans-serif; }
+  .lab-glass span { position: relative; z-index: 1; text-shadow: 0 1px 1px rgba(255,255,255,.6); }
+  .lab-glass.lg-glass { --lg-radius: inherit; }
+  .lab-glass.blur-only::before { backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-sat)); }
+</style>
+</head>
+<body>
+<aside aria-label="Controls">
+  <h1>Refraction Test Lab</h1>
+  <p>Physically inspired WebGL2 glass vs the v1 SVG filter. Not Apple's renderer.</p>
+  <div class="sel"><label for="mode">Renderer</label>
+    <select id="mode">
+      <option value="webgl">New — WebGL2 SDF refraction</option>
+      <option value="svg">Old — v1 SVG backdrop-filter</option>
+      <option value="blur">Blur only</option>
+      <option value="compare">Side by side: old vs new</option>
+      <option value="compare-blur">Side by side: blur vs new</option>
+    </select></div>
+  <div class="sel"><label for="bg">Background</label>
+    <select id="bg">
+      <option value="checker">Checkerboard</option>
+      <option value="lines">High-contrast straight lines</option>
+      <option value="grid">Fine grid</option>
+      <option value="gradient">Colour gradient</option>
+      <option value="photo">Photo (NASA Blue Marble)</option>
+      <option value="moving">Moving background</option>
+    </select></div>
+  <div class="sel"><label for="photo-file">Use your own photo</label><input type="file" id="photo-file" accept="image/*"></div>
+  <div class="sel"><label for="debug">View</label>
+    <select id="debug"><option value="0">Final</option><option value="1">Surface normals</option><option value="2">UV offset</option><option value="3">Distance bands</option></select></div>
+  <div class="sel"><label for="profile">Bend profile</label>
+    <select id="profile"><option value="rim">Rim lens (signature)</option><option value="physical">Physical bevel (Snell)</option></select></div>
+  <label><input type="checkbox" id="pause"> Pause motion</label>
+  <div id="controls"></div>
+  <button id="reset" type="button">Reset to signature (sweet spot)</button>
+  <h2 class="side-h">Your sweet spot</h2>
+  <p>Tune, then copy these settings and paste them to Claude.</p>
+  <button id="copy" type="button">Copy settings</button> <span id="copy-msg" aria-live="polite"></span>
+  <pre id="settings-json"></pre>
+  <div id="status" aria-live="polite">…</div>
+</aside>
+<main id="grids" aria-label="Shapes"></main>
+<!-- build:js -->
+<script type="module" src="./lab.js"></script>
+<!-- /build:js -->
+</body>
+</html>

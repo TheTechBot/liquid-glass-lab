@@ -1,0 +1,30 @@
+name: Deploy demos to GitHub Pages
+on:
+  push: { branches: [main] }
+  workflow_dispatch:
+permissions: { contents: read, pages: write, id-token: write }
+concurrency: { group: pages, cancel-in-progress: true }
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: { name: github-pages, url: "${{ steps.deployment.outputs.page_url }}" }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm run build
+      - name: Assemble site
+        run: |
+          mkdir -p _site/images
+          cp site/index.html _site/
+          cp implementations/web/dist/liquid-glass-demo.html _site/demo.html
+          cp implementations/web/dist/refraction-lab.html _site/lab.html
+          cp implementations/web/dist/liquid-glass-starter.html _site/starter.html
+          cp implementations/web/dist/liquid-glass-effect-demo.html _site/glass.html
+          cp docs/images/*.png docs/images/*.gif _site/images/
+          cp implementations/web/dist/liquid-glass.css implementations/web/dist/liquid-glass.iife.js implementations/web/dist/liquid-glass-refraction.iife.js _site/
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: _site }
+      - id: deployment
+        uses: actions/deploy-pages@v4

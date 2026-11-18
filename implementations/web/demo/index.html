@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Liquid Glass Lab — Web Demo</title>
+<!-- build:css -->
+<link rel="stylesheet" href="../src/tokens.css">
+<link rel="stylesheet" href="../src/liquid-glass.css">
+<!-- /build:css -->
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    font: 15px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: radial-gradient(1200px 800px at 20% 10%, #2a2f45, #0d0f16);
+    color: #e8e8ee;
+    display: flex; align-items: center; justify-content: center; gap: 40px; padding: 24px; flex-wrap: wrap;
+  }
+  .phone {
+    position: relative; width: 390px; height: 844px; border-radius: 54px; overflow: hidden;
+    box-shadow: 0 0 0 10px #1b1c22, 0 0 0 11px #3a3b44, 0 40px 120px rgba(0,0,0,.6);
+    background: #f2f2f7; color: #0b0b0f;
+  }
+  [data-lg-scheme="dark"] .phone { background: #000; color: #f5f5f7; }
+  #screen { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; padding: 112px 16px 120px; }
+  #screen::-webkit-scrollbar { display: none; }
+
+  /* content layer */
+  .hero {
+    position: relative; height: 420px; border-radius: 34px; overflow: hidden; margin-bottom: 20px;
+    background:
+      radial-gradient(160px 160px at 75% 22%, #ffe26a 0 40%, transparent 41%),
+      radial-gradient(300px 200px at 20% 80%, #ff4d8d, transparent 70%),
+      radial-gradient(260px 260px at 90% 90%, #2ad4ff, transparent 70%),
+      linear-gradient(160deg, #ff8a3d 0%, #ff5e7e 40%, #7a4cff 75%, #1d2b8f 100%);
+  }
+  .hero::after { /* hills */
+    content: ""; position: absolute; left: -10%; right: -10%; bottom: -40px; height: 220px;
+    background: radial-gradient(60% 100% at 30% 100%, #19224f 0 60%, transparent 61%), radial-gradient(70% 90% at 80% 100%, #0e1536 0 60%, transparent 61%);
+  }
+  .hero__art { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
+  .hero__meta { position: absolute; left: 20px; top: 20px; color: #fff; z-index: 2; text-shadow: 0 1px 8px rgba(0,0,0,.35); }
+  .hero__meta h2 { margin: 0; font-size: 28px; letter-spacing: -.02em; }
+  .hero__meta p { margin: 2px 0 0; font-weight: 600; opacity: .9; }
+  .media-wrap { position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 3; border-radius: 999px; }
+  .media { display: flex; gap: 6px; padding: 6px; }
+  .media .lg-btn svg { width: 26px; height: 26px; }
+  .media .lg-btn--play { width: 56px; height: 56px; }
+
+  h3.section { font-size: 20px; letter-spacing: -.01em; margin: 26px 4px 10px; }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .lg-btn--filled { border-radius: 999px; background: #0a6ad0; color: #fff; }
+  .lg-btn--plain { border-radius: 999px; background: rgba(120,120,128,.16); color: inherit; }
+  .card { padding: 12px; border-radius: 26px; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+  [data-lg-scheme="dark"] .card { background: #1c1c1e; }
+  .card__art { height: 110px; border-radius: 18px; margin-bottom: 10px; }
+  .card h4 { margin: 0; font-size: 15px; }
+  .card p { margin: 2px 0 0; font-size: 13px; opacity: .6; }
+  .settings { margin-top: 12px; padding: 6px 16px; border-radius: 26px; background: #fff; }
+  [data-lg-scheme="dark"] .settings { background: #1c1c1e; }
+  .settings__row { display: flex; align-items: center; justify-content: space-between; min-height: 52px; gap: 16px; }
+  .settings__row + .settings__row { border-top: .5px solid rgba(128,128,128,.3); }
+  .settings__row .lg-slider { flex: 1; color: inherit; }
+  .list p { margin: 0; padding: 14px 4px; border-bottom: .5px solid rgba(128,128,128,.25); }
+  .list strong { display: block; }
+
+  /* navigation layer */
+  .topbar { position: absolute; z-index: 10; top: 54px; left: 16px; right: 16px; display: flex; align-items: center; justify-content: space-between; }
+  .topbar__end { display: flex; gap: 8px; }
+  .topbar h1 { position: absolute; left: 50%; transform: translateX(-50%); margin: 0; font-size: 17px; font-weight: 600; }
+  .tabbar-wrap { position: absolute; z-index: 10; left: 16px; right: 16px; bottom: 28px; }
+  .lg-scroll-edge--top { height: 120px; }
+  .lg-scroll-edge--bottom { height: 120px; }
+
+  /* overlays */
+  #menu { z-index: 30; }
+  #panel { position: absolute; z-index: 25; left: 10px; right: 10px; bottom: 10px; }
+  #panel h2 { margin: 0 0 4px; font-size: 22px; letter-spacing: -.02em; }
+  #panel p { margin: 0 0 16px; color: var(--lg-text-2); }
+  #panel .row { justify-content: flex-end; }
+  #panel .close { position: absolute; top: 14px; right: 14px; }
+
+  /* side panel (plain UI, not glass) */
+  .side { width: 320px; font-size: 14px; }
+  .side h1 { font-size: 20px; margin: 0 0 6px; }
+  .side p { color: #a9abb8; margin: 0 0 14px; }
+  .side fieldset { border: 1px solid #333645; border-radius: 12px; margin: 0 0 14px; padding: 10px 14px; }
+  .side legend { padding: 0 6px; color: #a9abb8; }
+  .side label { display: flex; gap: 10px; align-items: center; padding: 5px 0; cursor: pointer; }
+  .side pre { white-space: pre-wrap; background: #161822; border-radius: 10px; padding: 10px; font-size: 12px; color: #cfd2e0; max-height: 220px; overflow: auto; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 6px; background: #273049; font-size: 12px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+</style>
+</head>
+<body>
+
+<main class="phone" aria-label="Liquid Glass demo device">
+  <div id="screen" data-lg-layer="content">
+    <section class="hero" aria-label="Now playing artwork">
+      <!-- artwork drawn to a canvas so the v2 WebGL engine can refract the real pixels (CSS gradient stays as fallback) -->
+      <canvas class="hero__art" id="hero-art" aria-hidden="true"></canvas>
+      <div class="hero__meta"><h2>Golden Hour</h2><p>Lab Sessions · Vol. 2</p></div>
+      <!-- clear glass: over media, with localized 35% dimming (HIG), bold white glyphs -->
+      <div class="media-wrap lg-dim lg-dim--local" data-lg-layer="control">
+        <div class="media lg-glass lg-glass--clear lg-group" data-lg-container id="media-controls">
+          <button class="lg-btn lg-btn--icon" aria-label="Previous track" data-lg-interactive><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg></button>
+          <button class="lg-btn lg-btn--icon lg-btn--play" id="play" aria-label="Pause" aria-pressed="true" data-lg-interactive><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg></button>
+          <button class="lg-btn lg-btn--icon" aria-label="Next track" data-lg-interactive><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 5h2v14h-2zM4 5v14l11-7z"/></svg></button>
+        </div>
+      </div>
+    </section>
+
+    <div class="lg-segmented lg-segmented--content" role="tablist" aria-label="Section" id="seg">
+      <button role="tab" aria-selected="true" data-value="foryou">For You</button>
+      <button role="tab" aria-selected="false" data-value="library">Library</button>
+      <button role="tab" aria-selected="false" data-value="browse">Browse</button>
+    </div>
+
+
+    <h3 class="section">Recently played</h3>
+    <!-- content layer: NO glass on cards (HIG). Plain surfaces. -->
+    <div class="cards">
+      <article class="card"><div class="card__art" style="background:linear-gradient(135deg,#34c759,#0a84ff)"></div><h4>Morning Run</h4><p>32 songs</p></article>
+      <article class="card"><div class="card__art" style="background:linear-gradient(135deg,#ff9f0a,#ff375f)"></div><h4>Deep Focus</h4><p>48 songs</p></article>
+      <article class="card"><div class="card__art" style="background:linear-gradient(135deg,#bf5af2,#5e5ce6)"></div><h4>Night Drive</h4><p>21 songs</p></article>
+      <article class="card"><div class="card__art" style="background:linear-gradient(135deg,#64d2ff,#30d158)"></div><h4>Weekend</h4><p>60 songs</p></article>
+    </div>
+
+    <h3 class="section">Actions</h3>
+    <div class="row" data-lg-layer="control">
+      <button class="lg-btn lg-btn--plain" id="btn-secondary">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/></svg>
+        <span>Favourite</span>
+      </button>
+      <button class="lg-btn lg-btn--filled" id="open-panel">
+        <span>Open panel</span>
+      </button>
+    </div>
+
+    <h3 class="section">Playback</h3>
+    <div class="settings">
+      <div class="settings__row"><span id="lbl-vol">Volume</span>
+        <div class="lg-slider lg-focusable" role="slider" tabindex="0" aria-labelledby="lbl-vol" aria-valuemin="0" aria-valuemax="100" aria-valuenow="60" id="vol">
+          <div class="lg-slider__track"><div class="lg-slider__fill"></div></div><div class="lg-slider__knob"></div>
+        </div>
+      </div>
+      <div class="settings__row"><span id="lbl-cross">Crossfade</span><button class="lg-toggle lg-focusable" role="switch" aria-checked="true" aria-labelledby="lbl-cross" id="toggle"><span class="lg-toggle__knob"></span></button></div>
+      <div class="settings__row"><span id="lbl-lossless">Lossless audio</span><button class="lg-toggle lg-focusable" role="switch" aria-checked="false" aria-labelledby="lbl-lossless"><span class="lg-toggle__knob"></span></button></div>
+    </div>
+
+    <h3 class="section">Up next</h3>
+    <div class="list">
+      <p><strong>Glass Harbour</strong>Lab Sessions · 3:41</p>
+      <p><strong>Refraction</strong>The Lensmakers · 4:02</p>
+      <p><strong>Specular</strong>Highlight Club · 2:58</p>
+      <p><strong>Concentric</strong>Round Corners · 3:33</p>
+      <p><strong>Materialize</strong>Soft Light · 5:10</p>
+      <p><strong>Scroll Edge</strong>Dissolve · 3:12</p>
+      <p><strong>Thin Overlay</strong>Vibrancy · 4:44</p>
+      <p><strong>Morph</strong>Container Spacing · 3:05</p>
+    </div>
+  </div>
+
+  <!-- scroll edge effects: keep floating bars legible over scrolling content -->
+  <div class="lg-scroll-edge lg-scroll-edge--top" aria-hidden="true"></div>
+  <div class="lg-scroll-edge lg-scroll-edge--bottom" aria-hidden="true"></div>
+
+  <!-- navigation layer -->
+  <header class="topbar" data-lg-layer="navigation">
+    <button class="lg-glass lg-btn lg-btn--icon" aria-label="Back" data-lg-interactive id="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <h1>Listen Now</h1>
+    <!-- grouped toolbar items share one background (E-01) -->
+    <div class="topbar__end">
+    <!-- one tinted primary action only (E-07) -->
+    <button class="lg-glass lg-glass--tinted lg-btn lg-btn--icon" aria-label="Add to library" data-lg-interactive id="add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+    <div class="lg-glass lg-group" role="group" aria-label="Page actions" id="top-actions" data-lg-container>
+      <button class="lg-btn lg-btn--icon" aria-label="More options" data-lg-interactive data-lg-menu-trigger="menu" id="more"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
+    </div>
+    </div>
+  </header>
+
+  <nav class="tabbar-wrap" aria-label="Main" data-lg-layer="navigation">
+    <div class="lg-tabbar" data-lg-minimize-on="#screen" id="tabbar">
+      <div class="lg-glass lg-segmented" role="tablist" aria-label="Tabs" data-lg-refract-auto data-lg-size="md" id="tabs">
+        <button role="tab" aria-selected="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l9 8h-3v9h-5v-6h-2v6H6v-9H3z"/></svg><span>Home</span></button>
+        <button role="tab" aria-selected="false"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg><span>Browse</span></button>
+        <button role="tab" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="2.5" fill="currentColor"/><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M5 5a10 10 0 0 0 0 14M19 5a10 10 0 0 1 0 14"/></svg><span>Radio</span></button>
+        <button role="tab" aria-selected="false"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 4h14v4H5zM5 10h14v4H5zM5 16h14v4H5z"/></svg><span>Library</span></button>
+      </div>
+      <!-- search tab separated at trailing end (E-01 Tab(role: .search)) -->
+      <button class="lg-glass lg-btn lg-btn--icon lg-tabbar__search" aria-label="Search" data-lg-interactive id="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg></button>
+    </div>
+  </nav>
+
+  <!-- overlay layer: menu morphs out of the "More" button -->
+  <div id="menu" class="lg-glass lg-glass--lg lg-menu" role="menu" aria-label="More options" hidden data-lg-size="lg">
+    <button role="menuitem"><span>Share</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 15V3M7 8l5-5 5 5M5 13v7h14v-7"/></svg></button>
+    <button role="menuitem"><span>Add to playlist</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h12M4 12h12M4 18h8M18 15v6M15 18h6"/></svg></button>
+    <button role="menuitem"><span>Show album</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2"/></svg></button>
+    <div role="separator"></div>
+    <button role="menuitem" class="is-destructive"><span>Remove</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 7h14M9 7V4h6v3M7 7l1 13h8l1-13"/></svg></button>
+  </div>
+
+  <section id="panel" class="lg-glass lg-glass--lg lg-panel" role="dialog" aria-modal="false" aria-labelledby="panel-title" hidden data-lg-size="lg">
+    <button class="lg-btn lg-btn--icon close" aria-label="Close panel" id="close-panel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <h2 id="panel-title">Sleep timer</h2>
+    <p>Floating panel on the overlay layer. Materializes with lensing ramp, not a plain fade.</p>
+    <div class="lg-segmented" role="radiogroup" aria-label="Timer length" id="timer">
+      <button role="radio" aria-checked="false">15m</button>
+      <button role="radio" aria-checked="true">30m</button>
+      <button role="radio" aria-checked="false">1h</button>
+      <button role="radio" aria-checked="false">End</button>
+    </div>
+  </section>
+</main>
+
+<aside class="side" aria-label="Demo controls">
+  <h1>Liquid Glass Lab</h1>
+  <p>Web approximation of iOS 26 Liquid Glass. Not Apple's renderer. Refraction: <span class="tag" id="refract-status">…</span></p>
+  <fieldset><legend>Appearance</legend>
+    <label><input type="checkbox" id="opt-dark"> Dark scheme</label>
+  </fieldset>
+  <fieldset><legend>Accessibility simulation</legend>
+    <label><input type="checkbox" id="opt-rt"> Reduce Transparency</label>
+    <label><input type="checkbox" id="opt-ic"> Increase Contrast</label>
+    <label><input type="checkbox" id="opt-rm"> Reduce Motion</label>
+  </fieldset>
+  <fieldset><legend>Rule audit (visible surfaces)</legend>
+    <pre id="audit">—</pre>
+  </fieldset>
+  <p id="live" aria-live="polite"></p>
+</aside>
+
+<!-- build:js -->
+<script type="module">
+  import LG from '../src/liquid-glass.js';
+  import LGRefraction from '../src/liquid-glass-refraction.js';
+  window.__LG_READY__ = (async () => {
+    const html = document.documentElement;
+    const $ = (id) => document.getElementById(id);
+    const report = () => { const r = LG.audit(); $('audit').textContent = JSON.stringify(r, null, 2); return r; };
+
+    LG.init();
+
+    // ---- v2: real refraction for the media controls over the artwork canvas (rollback: ?renderer=svg) ----
+    const art = $('hero-art');
+    const drawArt = () => {
+      const r = art.getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, 2);
+      art.width = Math.round(r.width * dpr); art.height = Math.round(r.height * dpr);
+      const c = art.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const w = r.width, h = r.height;
+      const lin = c.createLinearGradient(w * 0.33, 0, w * 0.67, h);
+      [['#ff8a3d', 0], ['#ff5e7e', 0.4], ['#7a4cff', 0.75], ['#1d2b8f', 1]].forEach(([col, o]) => lin.addColorStop(o, col));
+      c.fillStyle = lin; c.fillRect(0, 0, w, h);
+      const blob = (x, y, rx, ry, col) => { c.save(); c.translate(x, y); c.scale(1, ry / rx); const g = c.createRadialGradient(0, 0, 0, 0, 0, rx); g.addColorStop(0, col); g.addColorStop(1, col.replace(/[\d.]+\)$/, '0)')); c.fillStyle = g; c.fillRect(-rx, -rx, rx * 2, rx * 2); c.restore(); };
+      blob(w * 0.2, h * 0.8, 300, 200, 'rgba(255,77,141,1)');
+      blob(w * 0.9, h * 0.9, 260, 260, 'rgba(42,212,255,1)');
+      c.fillStyle = '#ffe26a'; c.beginPath(); c.arc(w * 0.75, h * 0.22, 64, 0, 7); c.fill();
+      c.fillStyle = '#19224f'; c.beginPath(); c.ellipse(w * 0.3, h + 40, w * 0.72, 180, 0, Math.PI, 0); c.fill();
+      c.fillStyle = '#0e1536'; c.beginPath(); c.ellipse(w * 0.8, h + 40, w * 0.84, 162, 0, Math.PI, 0); c.fill();
+      LGRefraction.invalidate(art);
+    };
+    drawArt();
+    new ResizeObserver(drawArt).observe(art);
+    window.__media = LGRefraction.attach($('media-controls'), {
+      backdrop: art,
+      shape: { type: 'capsule' },
+      // signature bend; 'media' preset adds the dimming tint for glyph legibility over artwork
+      preset: 'media',
+    });
+    $('refract-status').textContent += LGRefraction.isSupported() ? ' · media: WebGL2 v2' : ' · media: fallback';
+    $('refract-status').textContent = LG.supportsRefraction() ? 'SVG displacement (Chromium)' : 'blur only (this browser)';
+
+    const bind = (id, attr, fn) => $(id).addEventListener('change', (e) => {
+      if (attr === 'data-lg-scheme') e.target.checked ? html.setAttribute(attr, 'dark') : html.removeAttribute(attr);
+      else e.target.checked ? html.setAttribute(attr, '') : html.removeAttribute(attr);
+      LG.refresh(); LGRefraction.refresh(); fn && fn(); report();
+    });
+    bind('opt-dark', 'data-lg-scheme');
+    bind('opt-rt', 'data-lg-rt');
+    bind('opt-ic', 'data-lg-ic');
+    bind('opt-rm', 'data-lg-rm');
+
+    // preserve-functionality example: play/pause state is app logic, glass is only styling
+    $('play').addEventListener('click', (e) => {
+      const b = e.currentTarget; const playing = b.getAttribute('aria-pressed') === 'true';
+      b.setAttribute('aria-pressed', String(!playing)); b.setAttribute('aria-label', playing ? 'Play' : 'Pause');
+      b.querySelector('svg').innerHTML = playing ? '<path d="M7 4l13 8-13 8z"/>' : '<path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/>';
+      $('live').textContent = playing ? 'Paused' : 'Playing';
+    });
+
+    const panel = $('panel');
+    $('open-panel').addEventListener('click', async () => {
+      if (!panel.hidden) return;
+      LG.refract(panel, 'lg');
+      // sheet covers the tab bar: dematerialize it first so glass never stacks on glass
+      await LG.dematerialize(document.getElementById('tabbar'));
+      await LG.materialize(panel);
+      LG.morphIndicator($('timer'));
+      $('close-panel').focus();
+      report();
+    });
+    $('close-panel').addEventListener('click', async () => { await LG.dematerialize(panel); await LG.materialize(document.getElementById('tabbar')); $('open-panel').focus(); report(); });
+    panel.addEventListener('keydown', (e) => { if (e.key === 'Escape') $('close-panel').click(); });
+
+    // refract menu lazily on first open (budget: <=2 refracting surfaces)
+    $('more').addEventListener('click', () => LG.refract($('menu'), 'lg'), { capture: true });
+    $('screen').addEventListener('scroll', () => { clearTimeout(window.__a); window.__a = setTimeout(report, 150); }, { passive: true });
+    document.addEventListener('lg-change', (e) => { $('live').textContent = `Changed: ${e.detail.value}`; });
+
+    report();
+    return true;
+  })();
+</script>
+<!-- /build:js -->
+</body>
+</html>

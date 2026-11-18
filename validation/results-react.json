@@ -1,0 +1,55 @@
+{
+  "date": "2026-11-18T06:18:41.884Z",
+  "results": [
+    {
+      "name": "React demo renders without errors or audit warnings",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "v2 WebGL refraction active on media controls (refraction prop)",
+      "pass": true,
+      "detail": "data-lg-renderer=webgl"
+    },
+    {
+      "name": "existing state logic preserved (play toggles)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "FloatingTabBar selection updates",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "GlassMenu opens, focuses first item, audit clean",
+      "pass": true,
+      "detail": "{\"hidden\":false,\"focus\":\"menuitem\",\"audit\":[]}"
+    },
+    {
+      "name": "menu item onSelect runs and menu closes",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "FloatingPanel materializes and hides tab bar (no glass on glass)",
+      "pass": true,
+      "detail": "{\"panel\":true,\"barHidden\":true,\"audit\":[]}"
+    },
+    {
+      "name": "panel closes on Escape and tab bar returns",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Provider override sets data-lg-rt on <html>",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "no errors during run",
+      "pass": true,
+      "detail": ""
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "name": "liquid-glass-lab",
+  "version": "0.3.0",
+  "private": true,
+  "description": "Liquid Glass-inspired UI system with a WebGL2 SDF refraction engine, a refraction test lab, and a Claude skill.",
+  "license": "MIT",
+  "repository": "github:TheTechBot/liquid-glass-lab",
+  "scripts": {
+    "build": "node design-system/tokens/build-tokens.mjs && node implementations/web/build.mjs",
+    "setup:tests": "cd validation && npm ci",
+    "test": "npm run test:refraction && npm run test:web && npm run test:glass",
+    "test:refraction": "cd validation && node run-refraction-tests.mjs",
+    "test:web": "cd validation && node run-validation.mjs",
+    "test:glass": "cd validation && node run-glass-effect-tests.mjs",
+    "test:react": "cd implementations/react && npm ci && npm run typecheck && npm run build:demo && cd ../../validation && node run-react-smoke.mjs",
+    "skill:zip": "cd skill && node -e \"require('child_process').execSync(process.platform==='win32'?'powershell Compress-Archive -Force liquid-glass-ui liquid-glass-ui-skill.zip':'zip -qr liquid-glass-ui-skill.zip liquid-glass-ui',{stdio:'inherit'})\""
+  },
+  "engines": { "node": ">=18" }
+}

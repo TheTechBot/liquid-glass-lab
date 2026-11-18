@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Liquid Glass — glassEffect / GlassEffectContainer demo</title>
+<!--
+  Web port of the SwiftUI Liquid Glass API (glassEffect, Glass.regular/.clear/.identity, .tint, .interactive,
+  GlassEffectContainer, glassEffectID morphing). Approximation on our WebGL2 engine — not Apple's renderer.
+-->
+<!-- build:css -->
+<link rel="stylesheet" href="../src/tokens.css">
+<link rel="stylesheet" href="../src/liquid-glass.css">
+<!-- /build:css -->
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { font: 15px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: #fff; overflow: hidden; background: #101830; }
+  #scene { position: fixed; inset: 0; width: 100vw; height: 100vh; }
+  .app { position: relative; height: 100vh; display: grid; grid-template-rows: auto 1fr auto; padding: 18px clamp(14px, 4vw, 36px) 22px; }
+  .top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .title { font-weight: 800; font-size: 22px; letter-spacing: -.02em; text-shadow: 0 2px 12px rgba(0,0,0,.35); }
+  /* toolbar group: one container, items merge */
+  .toolbar { display: flex; gap: 10px; align-items: center; }
+  .ib { width: 44px; height: 44px; border: 0; display: grid; place-items: center; background: transparent; color: #0b0b0f; cursor: pointer; padding: 0; }
+  .ib svg { width: 22px; height: 22px; }
+  .ib.done { color: #fff; }
+  .mid { display: grid; grid-template-columns: 1fr 1fr; align-items: center; justify-items: center; gap: 20px; }
+  .label { font: 600 12px system-ui; letter-spacing: .06em; text-transform: uppercase; opacity: .85; text-align: center; margin-top: 12px; text-shadow: 0 1px 6px rgba(0,0,0,.5); }
+  /* expandable actions (reference morphing example) */
+  .actions { display: grid; grid-template-columns: 56px 56px 56px; grid-template-rows: 56px 56px 56px; gap: 30px; place-items: center; }
+  .act { width: 44px; height: 44px; border: 0; display: grid; place-items: center; background: transparent; color: #0b0b0f; cursor: pointer; padding: 0; }
+  .act svg { width: 22px; height: 22px; }
+  .toggle { width: 56px; height: 56px; color: #fff; grid-area: 2 / 2; }
+  .toggle svg { width: 26px; height: 26px; transition: transform .4s cubic-bezier(.34,1.56,.64,1); }
+  .actions[data-open] .toggle svg { transform: rotate(135deg); }
+  .a-rotate { grid-area: 1 / 2; } .a-adjust { grid-area: 2 / 1; } .a-crop { grid-area: 2 / 3; } .a-enh { grid-area: 3 / 2; }
+  /* variants */
+  .variants { display: flex; gap: 16px; align-items: center; }
+  .chip { min-height: 48px; padding: 0 22px; border: 0; display: inline-flex; align-items: center; font: 700 15px system-ui; background: transparent; cursor: pointer; color: #0b0b0f; }
+  .chip.clear { color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.55); }
+  .chip.tinted { color: #fff; }
+  /* floating tab bar */
+  .tabs { justify-self: center; display: flex; gap: 2px; padding: 6px; }
+  .tab { display: grid; justify-items: center; gap: 2px; min-width: 76px; padding: 7px 10px; border: 0; background: transparent; font: 600 11px system-ui; color: #0b0b0f; cursor: pointer; border-radius: 999px; }
+  .tab svg { width: 24px; height: 24px; }
+  .tab[aria-selected="true"] { color: #0a5bd6; background: rgba(255,255,255,.42); }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  @media (max-width: 720px) { .mid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<canvas id="scene" data-lg-backdrop-source aria-hidden="true"></canvas>
+<div class="app">
+  <header class="top">
+    <div class="title">Photos</div>
+    <!-- ToolbarItemGroup + ToolbarSpacer + tinted Done: two containers -->
+    <div class="toolbar">
+      <div class="toolbar" data-glass-container="12">
+        <button class="ib" data-glass data-glass-interactive data-glass-shape="circle" aria-label="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20h4L19 9l-4-4L4 16v4z"/></svg></button>
+        <button class="ib" data-glass data-glass-interactive data-glass-shape="circle" aria-label="Share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v12M7 8l5-5 5 5M5 13v7h14v-7"/></svg></button>
+      </div>
+      <div data-glass-container="0">
+        <button class="ib done" data-glass data-glass-tint="#0a64e0" data-glass-interactive data-glass-shape="circle" aria-label="Done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12l5 5 9-10"/></svg></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="mid">
+    <section>
+      <div class="actions" id="actions" data-glass-container="30">
+        <button class="act toggle" data-glass data-glass-tint="#0a64e0" data-glass-interactive data-glass-id="toggle" data-glass-shape="circle" aria-label="More actions" aria-expanded="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </div>
+      <div class="label">GlassEffectContainer · glassEffectID morph — tap +</div>
+    </section>
+    <section>
+      <div class="variants">
+        <button class="chip" data-glass="regular" data-glass-interactive>Regular</button>
+        <button class="chip clear" data-glass="clear" data-glass-interactive>Clear</button>
+        <button class="chip tinted" data-glass="regular" data-glass-tint="#0a64e0" data-glass-interactive>Tinted</button>
+        <button class="chip" id="idbtn" data-glass="regular" data-glass-interactive aria-pressed="true">Identity</button>
+      </div>
+      <div class="label">.regular · .clear · .tint · .identity (tap the last one)</div>
+    </section>
+  </main>
+
+  <nav class="tabs" data-glass="regular" role="tablist" aria-label="Sections">
+    <button class="tab" role="tab" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7v9h-6v-6H9v6H3z"/></svg>Home</button>
+    <button class="tab" role="tab" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>Search</button>
+    <button class="tab" role="tab" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>Profile</button>
+  </nav>
+</div>
+
+<!-- build:js -->
+<script type="module">
+  import '../src/liquid-glass.js';
+  import '../src/liquid-glass-refraction.js';
+  import '../src/liquid-glass-effect.js';
+</script>
+<!-- /build:js -->
+<script>
+addEventListener('load', () => {
+  const { LG, LGRefraction, LGGlass } = window;
+  const { Glass, glassEffect, autoGlass } = LGGlass;
+  const canvas = document.getElementById('scene');
+  function drawScene() {
+    const dpr = Math.min(devicePixelRatio || 1, 2), w = innerWidth, h = innerHeight;
+    canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+    const c = canvas.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const g = c.createLinearGradient(0, 0, w, h);
+    g.addColorStop(0, '#14b8a6'); g.addColorStop(0.4, '#3b82f6'); g.addColorStop(0.75, '#a855f7'); g.addColorStop(1, '#f97316');
+    c.fillStyle = g; c.fillRect(0, 0, w, h);
+    const blob = (x, y, r, col) => { const q = c.createRadialGradient(x, y, 0, x, y, r); q.addColorStop(0, col); q.addColorStop(1, 'rgba(0,0,0,0)'); c.fillStyle = q; c.fillRect(x - r, y - r, r * 2, r * 2); };
+    blob(w * 0.8, h * 0.25, Math.max(w, h) * 0.3, 'rgba(253,224,71,0.9)');
+    blob(w * 0.15, h * 0.8, Math.max(w, h) * 0.32, 'rgba(244,63,94,0.75)');
+    c.strokeStyle = 'rgba(255,255,255,0.38)'; c.lineWidth = 2;
+    for (let y = 0; y < h; y += 34) { c.beginPath(); c.moveTo(0, y); c.lineTo(w, y + 40); c.stroke(); }
+    c.fillStyle = 'rgba(255,255,255,.18)'; c.font = '800 150px system-ui, sans-serif'; c.fillText('GLASS', w * 0.05, h * 0.5);
+    LGRefraction.invalidate(canvas);
+  }
+  drawScene(); addEventListener('resize', drawScene);
+  LG.init();
+  const { containers } = autoGlass(document);
+
+  // Reference "ExpandableActions" — withAnimation(.bouncy) { isExpanded.toggle() }
+  const box = document.getElementById('actions');
+  const ctr = box.__lgxContainer;
+  const icons = { rotate: '<path d="M20 12a8 8 0 1 1-3-6.3M20 4v5h-5"/>', adjust: '<path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/>', crop: '<path d="M6 2v16h16M2 6h16v16"/>', enhance: '<path d="M4 20L16 8M14 4l1 2 2 1-2 1-1 2-1-2-2-1 2-1zM19 11l.6 1.4L21 13l-1.4.6L19 15l-.6-1.4L17 13l1.4-.6z"/>' };
+  const cls = { rotate: 'a-rotate', adjust: 'a-adjust', crop: 'a-crop', enhance: 'a-enh' };
+  const toggle = box.querySelector('.toggle');
+  toggle.addEventListener('click', () => {
+    const open = !box.hasAttribute('data-open');
+    ctr.withAnimation(() => {
+      box.toggleAttribute('data-open', open); toggle.setAttribute('aria-expanded', String(open));
+      if (open) for (const id of Object.keys(icons)) {
+        const b = document.createElement('button');
+        b.className = `act ${cls[id]}`; b.setAttribute('aria-label', id);
+        b.setAttribute('data-glass', ''); b.setAttribute('data-glass-interactive', ''); b.setAttribute('data-glass-id', id); b.setAttribute('data-glass-shape', 'circle');
+        b.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${icons[id]}</svg>`;
+        box.appendChild(b);
+      } else box.querySelectorAll('.act:not(.toggle)').forEach((b) => b.remove());
+    });
+  });
+
+  // .identity toggle: glassEffect(isOn ? .regular : .identity)
+  const idb = document.getElementById('idbtn');
+  const idHandle = idb.__lgxHandle || glassEffect(idb, Glass.regular.interactive());
+  let on = true;
+  idb.addEventListener('click', () => { on = !on; idb.setAttribute('aria-pressed', String(on)); idHandle.update(on ? Glass.regular.interactive() : Glass.identity); idb.style.color = on ? '' : '#fff'; });
+
+  document.querySelectorAll('.tab').forEach((t) => t.addEventListener('click', () => document.querySelectorAll('.tab').forEach((x) => x.setAttribute('aria-selected', String(x === t)))));
+  window.__demo = { containers, ctr };
+});
+</script>
+</body>
+</html>

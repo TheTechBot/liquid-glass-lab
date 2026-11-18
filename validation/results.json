@@ -1,0 +1,192 @@
+{
+  "date": "2026-11-18T08:50:39.405Z",
+  "browser": "Chrome (Playwright channel=chrome), headless",
+  "results": [
+    {
+      "name": "contrast regular/light text over light backdrop",
+      "pass": true,
+      "detail": "worst 13.30:1 (min 4.5) over given backdrop"
+    },
+    {
+      "name": "contrast regular/dark text over dark backdrop",
+      "pass": true,
+      "detail": "worst 11.08:1 (min 4.5) over given backdrop"
+    },
+    {
+      "name": "info: regular/light over BLACK backdrop (scheme mismatch)",
+      "pass": true,
+      "detail": "1.68:1 — known limitation, no per-pixel light/dark flip on web"
+    },
+    {
+      "name": "contrast reduced-transparency light",
+      "pass": true,
+      "detail": "worst 15.94:1 (min 4.5) over white+black backdrop"
+    },
+    {
+      "name": "contrast reduced-transparency dark",
+      "pass": true,
+      "detail": "worst 12.86:1 (min 4.5) over white+black backdrop"
+    },
+    {
+      "name": "contrast increased-contrast light",
+      "pass": true,
+      "detail": "worst 21.00:1 (min 7) over white+black backdrop"
+    },
+    {
+      "name": "contrast tinted accent (80% accent + 20% black, 96% opacity) white 15px text",
+      "pass": true,
+      "detail": "worst 4.96:1 (min 4.5) over white+black backdrop"
+    },
+    {
+      "name": "warn: clear glass + HIG 35% dimming over PURE WHITE media, white glyphs",
+      "pass": true,
+      "warn": true,
+      "detail": "2.25:1 < 3:1 — mitigated by glyph drop-shadow (not captured by this math); avoid clear over very bright media"
+    },
+    {
+      "name": "contrast clear + 35% dimming over typical bright media (#bebebe), white glyphs",
+      "pass": true,
+      "detail": "3.64:1 (min 3)"
+    },
+    {
+      "name": "no page errors on load",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "refraction detected in Chromium",
+      "pass": true,
+      "detail": "{\"supported\":true,\"htmlClass\":true,\"filters\":1,\"backdrop\":\"blur(8.4px) url(\\\"#lg-refract-1\\\") saturate(1.8) brightness(1.04)\"}"
+    },
+    {
+      "name": "tab bar ::before backdrop-filter references SVG filter",
+      "pass": true,
+      "detail": "blur(8.4px) url(\"#lg-refract-1\") saturate(1.8) brightness(1.04)"
+    },
+    {
+      "name": "refraction visibly alters backdrop pixels (displacement scale N vs 0, same blur)",
+      "pass": true,
+      "detail": "2209/55104 px differ (>24 sum RGB)"
+    },
+    {
+      "name": "tab bar minimizes on scroll down and restores on scroll up",
+      "pass": true,
+      "detail": "min=true restored=true"
+    },
+    {
+      "name": "rule audit clean while scrolling (budget, glass-on-glass, content-layer, labels)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "tab click selects tab and moves morph pill",
+      "pass": true,
+      "detail": "{\"sel\":[\"false\",\"false\",\"true\",\"false\"],\"pill\":\"translateX(143px)\"}"
+    },
+    {
+      "name": "ArrowRight moves tab selection (roving tabindex)",
+      "pass": true,
+      "detail": "selected index 3"
+    },
+    {
+      "name": "toggle flips aria-checked",
+      "pass": true,
+      "detail": "true -> false"
+    },
+    {
+      "name": "slider ArrowRight increments value",
+      "pass": true,
+      "detail": "value 61"
+    },
+    {
+      "name": "slider knob is glass only while dragging (E-01/E-06)",
+      "pass": true,
+      "detail": "during=true after=false"
+    },
+    {
+      "name": "slider drag sets value",
+      "pass": true,
+      "detail": "value 80"
+    },
+    {
+      "name": "original functionality preserved (play/pause state)",
+      "pass": true,
+      "detail": "{\"p\":\"false\",\"l\":\"Play\"}"
+    },
+    {
+      "name": "menu opens from trigger with focus on first item",
+      "pass": true,
+      "detail": "{\"hidden\":false,\"expanded\":\"true\",\"focus\":\"menuitem\",\"triggerHidden\":false,\"audit\":[]}"
+    },
+    {
+      "name": "menu open: audit clean (refraction budget, no glass-on-glass)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Escape closes menu and returns focus to trigger",
+      "pass": true,
+      "detail": "{\"hidden\":true,\"focusId\":\"more\",\"expanded\":\"false\"}"
+    },
+    {
+      "name": "panel materializes, refracts, focus moves to close",
+      "pass": true,
+      "detail": "{\"hidden\":false,\"focus\":\"close-panel\",\"audit\":[],\"refract\":true}"
+    },
+    {
+      "name": "panel open: audit clean",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Escape closes panel",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "Reduce Transparency: near-opaque fill, refraction off",
+      "pass": true,
+      "detail": "{\"bg\":\"rgba(246, 246, 248, 0.94)\",\"border\":\"0px\",\"trans\":\"0.16s, 0.28s, 0.28s, 0.28s\",\"backdrop\":\"blur(14px) saturate(1.8) brightness(1.04)\",\"after\":\"block\"}"
+    },
+    {
+      "name": "Increase Contrast: solid fill, 2px border, no specular, no refraction",
+      "pass": true,
+      "detail": "{\"bg\":\"rgb(255, 255, 255)\",\"border\":\"2px\",\"trans\":\"0.16s, 0.28s, 0.28s, 0.28s\",\"backdrop\":\"blur(14px) saturate(1.8) brightness(1.04)\",\"after\":\"none\"}"
+    },
+    {
+      "name": "Reduce Motion: transitions capped at 140ms",
+      "pass": true,
+      "detail": "0.14s"
+    },
+    {
+      "name": "prefers-reduced-motion media query honoured",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "prefers-contrast: more media query honoured",
+      "pass": true,
+      "detail": "{\"bg\":\"rgb(255, 255, 255)\",\"border\":\"2px\",\"trans\":\"0.16s, 0.28s, 0.28s, 0.28s\",\"backdrop\":\"none\",\"after\":\"none\"}"
+    },
+    {
+      "name": "dark scheme switches glass text to light",
+      "pass": true,
+      "detail": "rgb(245, 245, 247)"
+    },
+    {
+      "name": "axe-core: no violations inside demo device",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "info: headless frame time during scroll (ms)",
+      "pass": true,
+      "detail": "median 16.7, p95 16.8 — headless/software GPU, not a device measurement"
+    },
+    {
+      "name": "no page errors during run",
+      "pass": true,
+      "detail": ""
+    }
+  ]
+}

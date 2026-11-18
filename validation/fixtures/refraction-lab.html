@@ -1,0 +1,17 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Refraction lab</title>
+<link rel="stylesheet" href="../../implementations/web/dist/liquid-glass.css">
+<style>
+ body{margin:0;padding:24px;background:repeating-linear-gradient(90deg,#111 0 6px,#fff 6px 12px),#fff;font:600 14px system-ui}
+ .bg{position:relative;height:150px;margin-bottom:16px;background:repeating-linear-gradient(0deg,transparent 0 22px,rgba(255,0,80,.8) 22px 28px),repeating-linear-gradient(90deg,#1b1b1b 0 26px,#f4f4f4 26px 52px)}
+ .pill{position:absolute;left:40px;top:35px;width:320px;height:80px;display:flex;align-items:center;justify-content:center}
+ .pill{}
+ .lab{position:absolute;right:16px;top:60px;background:#fff;padding:4px 8px}
+</style></head><body>
+<div class="bg"><div class="pill lg-glass" id="p0"><span>scale 0 (blur only)</span></div><span class="lab">0</span></div>
+<div class="bg"><div class="pill lg-glass" id="p1"><span>scale 44 (md token)</span></div><span class="lab">44</span></div>
+<div class="bg"><div class="pill lg-glass" id="p2"><span>scale 90</span></div><span class="lab">90</span></div>
+<script src="../../implementations/web/dist/liquid-glass.iife.js"></script>
+<script>
+ LG.init();
+ [['p0',0],['p1',44],['p2',90]].forEach(([id,s])=>{const el=document.getElementById(id);LG.refract(el,'md');document.querySelector('#'+el.style.getPropertyValue('--lg-filter').match(/#([^)]+)/)[1]+' feDisplacementMap').setAttribute('scale',s);});
+</script></body></html>

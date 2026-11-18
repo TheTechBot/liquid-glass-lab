@@ -1,0 +1,10 @@
+node_modules/
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/
+# local publish copies / temp
+*.publish.html
+backup/
+_site/
